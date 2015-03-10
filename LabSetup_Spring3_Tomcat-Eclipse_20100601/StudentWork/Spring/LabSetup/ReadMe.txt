@@ -1,0 +1,2 @@
+If there are any additional setup files needed for particular labs they would go here
+MOst of the needed files are already in the individual lab setup directories in the workspace, so there may not be anything here.

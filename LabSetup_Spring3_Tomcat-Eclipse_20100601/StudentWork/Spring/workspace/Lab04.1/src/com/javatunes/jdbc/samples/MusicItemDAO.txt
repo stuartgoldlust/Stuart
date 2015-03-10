@@ -1,0 +1,183 @@
+/*
+ * This code is sample code, provided as-is, and we make no
+ * warranties as to its correctness or suitablity for
+ * any purpose.
+ *
+ * We hope that it's useful to you.  Enjoy.
+ * Copyright 2006-7 LearningPatterns Inc.
+ */
+
+package com.javatunes.jdbc;
+
+import java.sql.*;
+import java.util.Collection;
+import java.util.ArrayList;
+import java.math.BigDecimal;
+
+import com.javatunes.util.MusicItem;
+
+public class MusicItemDAO
+{
+   // connection to the database (assumed to be open)
+   private Connection m_conn = null;
+   
+   //// Lab 4 ////
+   //-- declare the PreparedStatement for searchByKeyword --//
+   private PreparedStatement m_pstmtKeyword = null;   
+
+   // Lab 4-Optional
+   // declare the PreparedStatement for searchById
+   private PreparedStatement m_pstmtId = null;
+
+   //// Lab 5 ////
+   //-- declare the PreparedStatement for create --//
+   private PreparedStatement m_pstmtCreate = null;   
+   
+   
+   // constructor
+   public MusicItemDAO(Connection conn)
+   throws SQLException
+   {
+      // store the connection
+      m_conn = conn;
+      
+      //// Lab 4 ////
+      //-- define the ?-SQL for searchByKeyword --//
+      String sqlKeyword = "SELECT ITEM_ID, NUM, Title, Artist, ReleaseDate, ListPrice, Price " +
+         "FROM Item WHERE Title LIKE ? OR Artist LIKE ?";      
+      
+      //-- prepare the ?-SQL with the DBMS and initialize the PreparedStatement --//
+      m_pstmtKeyword = m_conn.prepareStatement(sqlKeyword);      
+
+      // Lab 4-Optional
+      // define the ?-SQL for searchById
+      String sqlId = "SELECT NUM, Title, Artist, ReleaseDate, ListPrice, Price " +
+         "FROM Item WHERE ITEM_ID = ?";
+      
+      // prepare the ?-SQL with the DBMS and initialize the PreparedStatement
+      m_pstmtId = m_conn.prepareStatement(sqlId);
+
+      //// Lab 5 ////
+      //-- define the ?-SQL for create --//
+      String sqlCreate = "INSERT INTO Item (NUM, Title, Artist, ReleaseDate, ListPrice, Price, Version) VALUES (?, ?, ?, ?, ?, ?, ?)";      
+      
+      //-- prepare the ?-SQL with the DBMS and initialize the PreparedStatement --//
+      m_pstmtCreate = m_conn.prepareStatement(sqlCreate);      
+   }
+   
+   
+   //// Lab 4-Optional - replaces Lab 3's searchById ////
+   public MusicItem searchById(Long id)
+   throws SQLException
+   {
+      // declare return value
+      MusicItem result = null;
+      
+      // set the ? parameter on the PreparedStatement
+      m_pstmtId.setLong(1, id);
+      
+      // execute the PreparedStatement, get a ResultSet back
+      ResultSet rs = m_pstmtId.executeQuery();
+      
+      //-- if ID found, extract data from the ResultSet and initialize the MusicItem return value --//
+      //-- if ID not found, the return value remains null --//
+      if (rs.next())    // ID found
+      {
+         // extract data from the ResultSet
+		 String     num			= rs.getString("NUM");
+		 String     title       = rs.getString("Title");
+         String     artist      = rs.getString("Artist");
+         Date       releaseDate = rs.getDate("ReleaseDate");
+         BigDecimal listPrice   = rs.getBigDecimal("ListPrice");
+         BigDecimal price       = rs.getBigDecimal("Price");
+         
+         // initialize the return value
+         result = new MusicItem(id, num, title, artist, releaseDate, listPrice, price);
+      }
+
+      // return the value object
+      return result;
+   }
+   
+   
+   //// Lab 4 ////
+   public Collection searchByKeyword(String keyword)
+   throws SQLException
+   {
+      // create storage for the results
+      Collection result = new ArrayList();
+      
+      // create the %keyword% wildcard syntax used in SQL LIKE operator
+      String wildcarded = "%" + keyword + "%";
+      
+      //-- set the ? parameters on the PreparedStatement --//
+      m_pstmtKeyword.setString(1, wildcarded);
+      m_pstmtKeyword.setString(2, wildcarded);      
+      
+      //-- execute the PreparedStatement, get a ResultSet back --//
+      ResultSet rs = m_pstmtKeyword.executeQuery();      
+      
+      //-- iterate through the ResultSet, extracting data from each row and creating an MusicItem from it --//
+      //-- add the MusicItem to the Collection via Collection's add method --//
+      while (rs.next())
+      {
+         // extract data from each row, create an MusicItem from it, add to Collection
+		 Long       id			= rs.getLong("ITEM_ID");
+		 String     num			= rs.getString("NUM");
+         String     title       = rs.getString("Title");
+         String     artist      = rs.getString("Artist");
+         Date       releaseDate = rs.getDate("ReleaseDate");
+         BigDecimal listPrice   = rs.getBigDecimal("ListPrice");
+         BigDecimal price       = rs.getBigDecimal("Price");
+         
+         MusicItem item = new MusicItem(id, num, title, artist, 
+										releaseDate, listPrice, price);
+         result.add(item);
+      }
+      
+      // return the Collection
+      return result;
+   }
+   
+   
+   //// Lab 5 ////
+   public void create(MusicItem item)
+   throws SQLException
+   {
+      //-- set the ? parameters on the PreparedStatement --//
+	  m_pstmtCreate.setString    (1, item.getNum());
+      m_pstmtCreate.setString    (2, item.getTitle());
+      m_pstmtCreate.setString    (3, item.getArtist());
+      m_pstmtCreate.setDate      (4, item.getReleaseDate());
+      m_pstmtCreate.setBigDecimal(5, item.getListPrice());
+      m_pstmtCreate.setBigDecimal(6, item.getPrice());   
+      m_pstmtCreate.setInt       (7, new Integer(1));
+      
+      //-- execute the PreparedStatement - ignore the update count --//
+      m_pstmtCreate.executeUpdate();      
+   }
+   
+   
+   //// Lab 4 and Lab 5 ////
+   public void close()
+   {
+      try
+      {
+         //// Lab 4 ////
+         //-- close the PreparedStatement for searchByKeyword --//
+         m_pstmtKeyword.close();
+
+         //// Lab 4-Optional ////
+         // close the PreparedStatement for searchById
+         m_pstmtId.close();
+
+         //// Lab 5 ////
+         //-- close the PreparedStatement for create --//
+         m_pstmtCreate.close();         
+      }
+      catch (SQLException sqle)
+      {
+         JDBCUtilities.printSQLException(sqle);
+      }
+   }
+}

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xmlns:context="http://www.springframework.org/schema/context"
+xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd 
+http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+
+	<!-- TODO: Add in annotation-config -->
+
+	<bean id="javatunesDataSource" 
+	      class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		  <property name="driverClassName"
+					value="org.apache.derby.jdbc.ClientDriver"/>
+		  <property name="url"
+					value="jdbc:derby://localhost:1527/JavaTunesDB"/>
+		  <property name="username" value="guest"/>
+		  <property name="password" value="password"/>
+	</bean>
+	
+	<!-- TODO: Set the classname correctly for HibernateJPA -->
+    <bean id="vendorAdapter" class="org.springframework.orm.jpa.vendor.TODO">
+       <property name="databasePlatform" value="org.hibernate.dialect.DerbyDialect"/>
+       <property name="showSql" value="true"/>
+       <property name="generateDdl" value="false"/>
+    </bean> 	
+
+    <!-- TODO: Set the EM factory classname, the dataSource persistenceUnitName, and jpaVendorApater properly -->
+    <bean id="javatunesEmf" class="org.springframework.orm.jpa.TODO">   
+      <property name="dataSource" ref="TODO"/> 
+      <property name="persistenceUnitName" value="TODO"/>
+      <property name="jpaVendorAdapter" ref="TODO"/>
+    </bean>
+
+    <bean id="musicItemDAO" class="com.javatunes.persist.JpaMusicItemDAO">
+    </bean>
+	
+</beans>

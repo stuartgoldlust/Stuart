@@ -1,0 +1,1 @@
+These scripts can be used in a Unix environment by copying them to the parent directory of this directory.

@@ -1,0 +1,129 @@
+/*
+ * Copyright 2004, LearningPatterns Inc.
+ * PO Box 3150 Guttenberg, NJ 07093
+ * 201.453.9519 
+ * http://www.LearningPatterns.com     info@LearningPatterns.com
+ *
+ * This code is sample code, provided as-is, and we make no
+ * warranties as to its correctness or suitablity for
+ * any purpose.
+ *
+ * Feel free to use it in any way that you want.  We
+ * hope that it's useful to you.  Enjoy.
+ */
+
+package com.javatunes.jdbc;
+
+import java.sql.*;
+import java.util.Collection;
+import java.util.Iterator;
+import java.math.BigDecimal;
+import com.javatunes.util.*;
+
+class JDBCTest
+{
+   public static void main(String[] args)
+   {
+      // Lab 2a - specify database driver and URL
+      String driver = "org.apache.derby.jdbc.ClientDriver";
+      String url = "jdbc:derby://localhost:1527/JavaTunesDB";
+      String usr = "guest";
+      String passwd = "password";
+
+      // Lab 2b - declare Connection here so we have access to it in finally
+      Connection conn = null;
+
+      // Lab 4 - declare DAO here so we have access to it in finally
+      MusicItemDAO dao = null;
+
+      try
+      {         
+         // Lab 2a - load the JDBC driver class - this can throw ClassNotFoundException
+         Class.forName(driver);
+         
+         // Lab 2a - connect to the database - this can throw SQLException
+         conn = DriverManager.getConnection(url,usr,passwd);
+         
+         // Lab 2b - print database metadata
+		 System.out.println("*** Database Metadata ***");
+         JDBCUtilities.printDatabaseMetaData(conn.getMetaData());
+		 System.out.println("*** Database Metadata ***\n");
+         
+         // Lab 2b - check for warnings
+		 System.out.println("*** Database Warnings ***");
+         JDBCUtilities.checkForWarnings(conn.getWarnings());
+		 System.out.println("*** Database Warnings ***\n");
+
+         // Lab 3 and Lab 4-Optional (prepared statement) - test MusicItemDAO.searchById
+
+         System.out.println("*** searchById = 2 ***");
+		 dao = new MusicItemDAO(conn);
+         MusicItem item = dao.searchById(new Long(2));
+         System.out.println(item);
+		 System.out.println("*** searchById = 2 ***\n");
+         
+         // Lab 4 - test MusicItemDAO.searchByKeyword
+
+         System.out.println("*** searchByKeyword = a ***");
+		 dao = new MusicItemDAO(conn);
+         Collection results = dao.searchByKeyword("a");
+         Iterator i = results.iterator();
+         while (i.hasNext())
+         {
+            MusicItem curItem = (MusicItem) i.next();
+            System.out.println(curItem);
+         }
+		 System.out.println("*** searchByKeyword = a ***\n");
+
+
+         // Lab 5 - test MusicItemDAO.create
+		 System.out.println("*** create ***");
+         dao = new MusicItemDAO(conn);
+         
+         // this value object has all 6 values
+         MusicItem createItem1 = new MusicItem(new Long(22), "CD522", "Ride the Lightning", "Metallica",
+            Date.valueOf("1984-09-16"), new BigDecimal("9.99"), new BigDecimal("7.77"));         
+         
+         // the Java null values should become SQL NULL values in the database
+         MusicItem createItem2 = new MusicItem(new Long(23), "CD523", null, null, null, null, null);  // PK cannot be NULL
+         
+         dao.create(createItem1);
+         dao.create(createItem2);
+         
+         // see if the data were inserted into the DB properly
+         MusicItem testItem1 = dao.searchById(createItem1.getId());
+         MusicItem testItem2 = dao.searchById(createItem2.getId());
+         System.out.println(testItem1);
+         System.out.println(testItem2);
+		 System.out.println("*** create ***\n");
+      }
+      catch (ClassNotFoundException e)
+      {
+         System.out.println(e);
+      }
+      catch (SQLException sqle)
+      {
+         JDBCUtilities.printSQLException(sqle);
+      }
+      finally
+      {
+         try
+         {
+            // Lab 4 - close DAO
+            if (dao != null)
+            {
+               dao.close();
+               System.out.println("MusicItemDAO closed.");
+            }
+            
+            // Lab 2b - close connection
+            if (conn != null)
+            {
+               conn.close();
+               System.out.println("Connection closed.");
+            }
+         }
+         catch (SQLException ignored) {  }
+      }
+   }
+}

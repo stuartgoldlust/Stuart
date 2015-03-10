@@ -1,0 +1,4 @@
+Right-click on the CmdPromptHere.reg file and choose 'Merge' or just double-click on it.
+
+You will then be able to right-click on a folder and choose 'Command Prompt Here'
+to open a command prompt in that directory.

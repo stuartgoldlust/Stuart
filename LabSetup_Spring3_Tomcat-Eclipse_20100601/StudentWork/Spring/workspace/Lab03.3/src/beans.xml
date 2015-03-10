@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+	<bean name="1-springBook, 2-javaBook" class="com.javatunes.teach.SpringCourseBook"/>
+
+	<bean id="springGuru" class="com.javatunes.teach.JavaInstructor">
+	   <property name="info" ref="1-springBook"/>
+	   <property name="favoriteTopic" value="Dependency Injection"/>
+	   <property name="age" value="35"/>
+	</bean>
+	
+   <bean id="messageSource"     
+         class="org.springframework.context.support.ResourceBundleMessageSource">
+      <!-- TODO - add in a property with a name of basename, and a value of javatunes -->
+   </bean>
+	
+
+</beans>

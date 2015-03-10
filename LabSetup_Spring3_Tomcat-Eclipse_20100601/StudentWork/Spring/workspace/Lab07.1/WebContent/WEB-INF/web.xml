@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<web-app 
+ xmlns="http://java.sun.com/xml/ns/j2ee" 
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee 
+ http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd" 
+ version="2.4"> 
+
+   <display-name>JavaTunesWeb</display-name>
+   
+	<!--
+	  - Location of the XML file that defines the root application context
+	  - Applied by ContextLoaderListener.
+	 -->
+	 
+	<context-param>
+		<!-- TODO add in the name of the context configuration parameter -->
+		<param-name>TODO</param-name>
+		<param-value>
+		    <!-- TODO Add in the application context configuration files -->
+			TODO
+			TODO
+		</param-value>
+	</context-param>	 
+
+   <!--
+	  - Loads the root application context of this web app at startup,
+	  - by default from "/WEB-INF/applicationContext.xml".
+		- Note that you need to fall back to Spring's ContextLoaderServlet for
+		-
+	  - Use WebApplicationContextUtils.getWebApplicationContext(servletContext)
+	  - to access it anywhere in the web application, outside of the framework.
+	  -
+	  - The root context is the parent of all servlet-specific contexts.
+	  - This means that its beans are automatically available in these child contexts,
+	  - both for getBean(name) calls and (external) bean references.
+	  -->
+	  
+	<listener>
+		<!-- Add in the org.springframework.web.context.ContextLoaderListener listener class -->
+		<listener-class>TODO</listener-class>
+	</listener>
+   
+   <!-- Servlet element for search servlet  -->
+   <servlet>
+      <display-name>Search Servlet</display-name>
+      <servlet-name>search</servlet-name>
+      <servlet-class>com.javatunes.web.SearchServlet</servlet-class>
+   </servlet>
+
+   <servlet-mapping>
+      <servlet-name>search</servlet-name>
+      <url-pattern>/search</url-pattern>
+   </servlet-mapping>
+   
+   <welcome-file-list>
+	<welcome-file>jsp/index.jsp</welcome-file>
+   </welcome-file-list>
+
+</web-app>
